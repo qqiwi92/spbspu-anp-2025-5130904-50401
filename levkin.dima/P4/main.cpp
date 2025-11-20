@@ -58,6 +58,27 @@ char *getLine(std::istream &in, size_t &size) {
 
   return buffer;
 }
+char *lat_rmv(char *original, char *destination, size_t & s) {
+    if (!original || !destination) {
+        return NULL;
+    }
+
+    size_t w = 0;
+    
+    for (size_t r = 0; original[r] != '\0'; r++) {
+        char ch = original[r];
+
+        if ((ch >= 'A' && ch <= 'Z') ||
+            (ch >= 'a' && ch <= 'z')) {
+            continue;
+        }
+
+        destination[w++] = ch;
+    }
+    s = w;
+    destination[w] = '\0';
+    return destination;
+}
 
 } // namespace levkin
 
