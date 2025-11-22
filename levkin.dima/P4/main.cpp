@@ -103,7 +103,7 @@ int main()
     size_t len = 0;
     char* str = levkin::getLine(std::cin, len);
 
-    if (!str) {
+    if (!str || len == 0) {
         std::cerr << "Error: cannot allocate memory or empty input\n";
         return 1;
     }
