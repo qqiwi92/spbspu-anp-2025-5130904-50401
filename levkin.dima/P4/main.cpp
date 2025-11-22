@@ -4,17 +4,18 @@
 
 namespace levkin {
 
-char* extend(char* old_buffer, size_t old_size, size_t new_size) {
+char* extend(char* old_buffer, size_t old_size, size_t new_size)
+{
     char* new_buffer = reinterpret_cast<char*>(malloc(new_size));
     if (!new_buffer) {
         return nullptr;
     }
 
-    for (size_t i = 0; i < old_size; ++i) {
+    for (size_t i = 0; i < old_size; i++) {
         new_buffer[i] = old_buffer[i];
     }
 
-    for (size_t i = old_size; i < new_size; ++i) {
+    for (size_t i = old_size; i < new_size; i++) {
         new_buffer[i] = ' ';
     }
 
@@ -22,7 +23,8 @@ char* extend(char* old_buffer, size_t old_size, size_t new_size) {
     return new_buffer;
 }
 
-char* get_line(std::istream& in, size_t& size) {
+char* getLine(std::istream& in, size_t& size)
+{
     bool is_skip_ws = in.flags() & std::ios_base::skipws;
     if (is_skip_ws) {
         in >> std::noskipws;
@@ -64,15 +66,17 @@ char* get_line(std::istream& in, size_t& size) {
     return buffer;
 }
 
-char* lat_rmv(const char* original, char* destination, size_t& s) {
+char* lat_rmv(const char* original, char* destination, size_t& s)
+{
     if (!original || !destination) {
         return nullptr;
     }
 
     size_t w = 0;
-    for (size_t r = 0; original[r] != '\0'; ++r) {
+    for (size_t r = 0; original[r] != '\0'; r++) {
         char ch = original[r];
-        if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+        if ((ch >= 'A' && ch <= 'Z') ||
+            (ch >= 'a' && ch <= 'z')) {
             continue;
         }
         destination[w++] = ch;
@@ -83,9 +87,10 @@ char* lat_rmv(const char* original, char* destination, size_t& s) {
     return destination;
 }
 
-int has_rep(const char* s) {
+int has_rep(const char* s)
+{
     int visited[256] = {0};
-    for (int i = 0; s[i] != '\0'; ++i) {
+    for (int i = 0; s[i] != '\0'; i++) {
         unsigned char c = s[i];
         if (visited[c] == 1) {
             return 1;
@@ -95,15 +100,16 @@ int has_rep(const char* s) {
     return 0;
 }
 
-}
-int main() {
+} 
+
+int main()
+{
     size_t s = 0;
-    const char* string = levkin::get_line(std::cin, s);
+    const char* string = levkin::getLine(std::cin, s);
     std::cout << "has rep: " << levkin::has_rep(string) << "\n";
 
     char* cleaned_string = new char[s];
-    std::cout << "removed eng lett: "
-              << levkin::lat_rmv(string, cleaned_string, s) << "\n";
+    std::cout << "removed eng lett: " << levkin::lat_rmv(string, cleaned_string, s) << "\n";
 
     delete[] cleaned_string;
     free(const_cast<char*>(string));
