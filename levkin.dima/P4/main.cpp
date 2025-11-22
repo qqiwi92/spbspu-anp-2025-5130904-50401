@@ -48,6 +48,12 @@ char* getLine(std::istream& in, size_t& size)
         buffer[size++] = c;
     }
 
+    if (size == 0) {
+        free(buffer);
+        if (is_skip_ws) in >> std::skipws;
+        return nullptr;
+    }
+
     if (size == capacity) {
         char* tmp = extend(buffer, capacity, capacity + 1);
         if (!tmp) {
@@ -64,7 +70,6 @@ char* getLine(std::istream& in, size_t& size)
     }
     return buffer;
 }
-
 int has_rep(const char* s)
 {
     unsigned char visited[256] = {0};
