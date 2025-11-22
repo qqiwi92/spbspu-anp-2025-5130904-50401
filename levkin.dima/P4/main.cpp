@@ -56,7 +56,6 @@ char* getLine(std::istream& in, size_t& size)
         }
         size += 1;
     }
-
     buffer[len] = '\0';
 
     if (is_skip_ws) {
@@ -100,7 +99,7 @@ int has_rep(const char* s)
     return 0;
 }
 
-} 
+}
 
 int main()
 {
