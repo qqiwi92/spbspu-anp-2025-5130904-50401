@@ -1,6 +1,7 @@
 #include <cstddef>
 #include <ios>
 #include <iostream>
+#include <cctype>
 
 namespace levkin {
 
@@ -10,15 +11,12 @@ char* extend(char* old_buffer, size_t old_size, size_t new_size)
     if (!new_buffer) {
         return nullptr;
     }
-
     for (size_t i = 0; i < old_size; i++) {
         new_buffer[i] = old_buffer[i];
     }
-
     for (size_t i = old_size; i < new_size; i++) {
         new_buffer[i] = ' ';
     }
-
     free(old_buffer);
     return new_buffer;
 }
@@ -30,88 +28,100 @@ char* getLine(std::istream& in, size_t& size)
         in >> std::noskipws;
     }
 
-    size = 5;
-    char* buffer = static_cast<char*>(malloc(size));
-    if (!buffer) {
-        return nullptr;
-    }
+    size = 0;
+    size_t capacity = 0;
+    char* buffer = nullptr;
 
-    size_t len = 0;
     char c;
     while (in >> c) {
-        if (len == size) {
-            buffer = extend(buffer, size, size + 5);
-            if (!buffer) {
+        if (size == capacity) {
+            size_t new_cap = capacity ? capacity + 5 : 5;
+            char* tmp = extend(buffer, capacity, new_cap);
+            if (!tmp) {
+                free(buffer);
+                if (is_skip_ws) in >> std::skipws;
                 return nullptr;
             }
-            size += 5;
+            buffer = tmp;
+            capacity = new_cap;
         }
-        buffer[len++] = c;
+        buffer[size++] = c;
     }
 
-    if (len == size) {
-        buffer = extend(buffer, size, size + 1);
-        if (!buffer) {
+    if (size == capacity) {
+        char* tmp = extend(buffer, capacity, capacity + 1);
+        if (!tmp) {
+            free(buffer);
+            if (is_skip_ws) in >> std::skipws;
             return nullptr;
         }
-        size += 1;
+        buffer = tmp;
     }
-    buffer[len] = '\0';
+    buffer[size] = '\0';
 
     if (is_skip_ws) {
         in >> std::skipws;
     }
-
     return buffer;
+}
+
+int has_rep(const char* s)
+{
+    unsigned char visited[256] = {0};
+    if (!s) return 0;
+    for (; *s; ++s) {
+        unsigned char c = *s;
+        if (visited[c]) return 1;
+        visited[c] = 1;
+    }
+    return 0;
 }
 
 char* lat_rmv(const char* original, char* destination, size_t& s)
 {
     if (!original || !destination) {
+        s = 0;
         return nullptr;
     }
-
     size_t w = 0;
-    for (size_t r = 0; original[r] != '\0'; r++) {
+    for (size_t r = 0; original[r]; ++r) {
         char ch = original[r];
-        if ((ch >= 'A' && ch <= 'Z') ||
-            (ch >= 'a' && ch <= 'z')) {
+        if (isalpha(static_cast<unsigned char>(ch))) {
             continue;
         }
         destination[w++] = ch;
     }
-
-    s = w;
     destination[w] = '\0';
+    s = w;
     return destination;
-}
-
-int has_rep(const char* s)
-{
-    int visited[256] = {0};
-    for (int i = 0; s[i] != '\0'; i++) {
-        unsigned char c = s[i];
-        if (visited[c] == 1) {
-            return 1;
-        }
-        visited[c] = 1;
-    }
-    return 0;
 }
 
 }
 
 int main()
 {
-    size_t s = 0;
-    const char* string = levkin::getLine(std::cin, s);
-    std::cout << "has rep: " << levkin::has_rep(string) << "\n";
+    size_t len = 0;
+    char* str = levkin::getLine(std::cin, len);
 
-    char* cleaned_string = new char[s];
-    std::cout << "removed eng lett: " << levkin::lat_rmv(string, cleaned_string, s) << "\n";
+    if (!str) {
+        std::cerr << "Error: cannot allocate memory or empty input\n";
+        return 1;
+    }
 
-    delete[] cleaned_string;
-    free(const_cast<char*>(string));
+    std::cout << "has rep: " << levkin::has_rep(str) << "\n";
 
+    char* cleaned = static_cast<char*>(malloc(len + 1));
+    if (!cleaned) {
+        std::cerr << "Error: cannot allocate memory\n";
+        free(str);
+        return 1;
+    }
+
+    size_t cleaned_len = 0;
+    levkin::lat_rmv(str, cleaned, cleaned_len);
+    std::cout << "removed eng lett: " << cleaned << "\n";
+
+    free(cleaned);
+    free(str);
     return 0;
 }
