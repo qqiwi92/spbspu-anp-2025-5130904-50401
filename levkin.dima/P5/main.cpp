@@ -22,7 +22,7 @@ public:
 class Rectangle : public Shape {
   rectangle_t data_fields;
 
-  Rectangle(point_t center, double width, double height)
+  public: Rectangle(point_t center, double width, double height)
       : data_fields{width, height, center} {}
   double getArea() const override {
     return data_fields.height * data_fields.width;
@@ -43,7 +43,7 @@ class Rectangle : public Shape {
 class Diamond : public Shape {
   rectangle_t data_fields;
 
-  Diamond(point_t center, double width, double height)
+  public: Diamond(point_t center, double width, double height)
       : data_fields{width, height, center} {}
   double getArea() const override {
     return .5 * data_fields.height * data_fields.width;
@@ -65,7 +65,7 @@ class Polygon : public Shape {
   point_t *points;
   size_t len;
   point_t anchor = {0, 0};
-  Polygon(point_t *points, size_t len) : points(points), len(len) {}
+  public: Polygon(point_t *points, size_t len) : points(points), len(len) {}
   double getArea() const override {
     double area = .0;
     for (size_t i = 0; i < len; ++i) {
@@ -180,6 +180,68 @@ void isotropicly_scale(Shape &shape, point_t anchor, double factor) {
   shape.move({anchor.x + dx * factor, anchor.y + dy * factor});
 }
 
+void printState(Shape** shapes, size_t count) {
+    double totalArea = 0;
+    double minX = 1e30, minY = 1e30, maxX = -1e30, maxY = -1e30;
+
+    for (size_t i = 0; i < count; ++i) {
+        double area = shapes[i]->getArea();
+        rectangle_t frame = shapes[i]->getFrameRect();
+        totalArea += area;
+
+        std::cout << "shape: " << i + 1 << " area: " << std::fixed << area << "\n";
+        std::cout << "framerect: w=" << frame.width << " h=" << frame.height 
+                  << "pos=(" << frame.pos.x << "," << frame.pos.y << ")\n";
+
+        minX = std::min(minX, frame.pos.x - frame.width / 2);
+        minY = std::min(minY, frame.pos.y - frame.height / 2);
+        maxX = std::max(maxX, frame.pos.x + frame.width / 2);
+        maxY = std::max(maxY, frame.pos.y + frame.height / 2);
+    }
+    std::cout << "total area: " << totalArea << "\n";
+    std::cout << "global frame: (" << minX << "," << minY << ") to (" << maxX << "," << maxY << ")\n";
+}
+
 } // namespace levkin
 
-int main() {}
+int main() {
+    const size_t count = 3;
+    levkin::Shape** shapes = new levkin::Shape*[count];
+
+    shapes[0] = new levkin::Rectangle({ 0, 0 }, 10, 10);
+    shapes[1] = new levkin::Diamond({ 10, 10 }, 4, 8);
+    levkin::point_t tri[] = { {0, 0}, {4, 0}, {0, 3} };
+    shapes[2] = new levkin::Polygon(tri, 3);
+
+    std::cout << "init\n";
+    levkin::printState(shapes, count);
+
+    std::cout << "\nenter scale point x y and scale factor: ";
+    levkin::point_t anchor;
+    double factor;
+
+    if (!(std::cin >> anchor.x >> anchor.y >> factor)) {
+        std::cerr << "error: invalid input data format.\n";
+        for (size_t i = 0; i < count; ++i) delete shapes[i];
+        delete[] shapes;
+        return 1;
+    }
+
+    if (factor <= 0) {
+        std::cerr << "error: scale factor must be positive.\n";
+        for (size_t i = 0; i < count; ++i) delete shapes[i];
+        delete[] shapes;
+        return 2;
+    }
+
+    for (size_t i = 0; i < count; ++i) {
+        levkin::isotropicly_scale(*shapes[i], anchor, factor);
+    }
+
+    std::cout << "\nafter scaling:\n";
+    levkin::printState(shapes, count);
+
+    delete[] shapes;
+
+    return 0;
+}
