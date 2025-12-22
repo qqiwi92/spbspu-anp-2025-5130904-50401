@@ -167,18 +167,18 @@ class Polygon : public Shape {
 };
 
 void isotropicly_scale(Shape &shape, point_t anchor, double factor) {
-    if (factor <= 0.0) return; 
-    rectangle_t frame = shape.getFrameRect();
-    point_t init_pos = frame.pos;
+  if (factor <= 0.0)
+    return;
+  rectangle_t frame = shape.getFrameRect();
+  point_t init_pos = frame.pos;
 
-    double dx = init_pos.x - anchor.x;
-    double dy = init_pos.y - anchor.y;
+  double dx = init_pos.x - anchor.x;
+  double dy = init_pos.y - anchor.y;
 
-    shape.move(anchor);
-    shape.scale(factor);
-    shape.move({anchor.x + dx * factor, anchor.y + dy * factor});
+  shape.move(anchor);
+  shape.scale(factor);
+  shape.move({anchor.x + dx * factor, anchor.y + dy * factor});
 }
-
 
 } // namespace levkin
 
