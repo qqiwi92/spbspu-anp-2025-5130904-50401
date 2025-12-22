@@ -100,7 +100,6 @@ class Polygon : public Shape {
         max_y = point.y;
       }
     }
-
     double width = max_x - min_x;
     double height = max_y - min_y;
     point_t center = {min_x + width / 2, min_y + height / 2};
@@ -120,7 +119,6 @@ class Polygon : public Shape {
     anchor.x += dx;
     anchor.y += dy;
   }
-
   virtual void scale(double k) override {
     if (k <= 0.0 || len == 0)
       return;
@@ -130,7 +128,6 @@ class Polygon : public Shape {
       points[i].y = center.y + (points[i].y - center.y) * k;
     }
   }
-
   ~Polygon() { delete points; }
   Polygon(const Polygon &poly) = default;
   Polygon(Polygon &&poly) = default;
@@ -190,7 +187,7 @@ void printState(Shape** shapes, size_t count) {
         totalArea += area;
 
         std::cout << "shape: " << i + 1 << " area: " << std::fixed << area << "\n";
-        std::cout << "framerect: w=" << frame.width << " h=" << frame.height 
+        std::cout << "framerect: w=" << frame.width << " h=" << frame.height
                   << "pos=(" << frame.pos.x << "," << frame.pos.y << ")\n";
 
         minX = std::min(minX, frame.pos.x - frame.width / 2);
@@ -202,7 +199,7 @@ void printState(Shape** shapes, size_t count) {
     std::cout << "global frame: (" << minX << "," << minY << ") to (" << maxX << "," << maxY << ")\n";
 }
 
-} // namespace levkin
+}
 
 int main() {
     const size_t count = 3;
