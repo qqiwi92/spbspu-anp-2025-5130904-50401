@@ -125,7 +125,34 @@ class Polygon : public Shape {
   Polygon(Polygon &&poly) = default;
   Polygon &operator=(const Polygon &poly) = default;
   Polygon &operator=(Polygon &&poly) = default;
-  point_t find_center() const {}
+  point_t find_center() const {
+      if (len == 0) {
+          return {0, 0};
+      }
+  
+      double area = getArea();
+      if (area == 0) {
+          return {0, 0};
+      }
+  
+      double cx = 0.0;
+      double cy = 0.0;
+  
+      for (size_t i = 0; i < len; ++i) {
+          const point_t &p1 = points[i];
+          const point_t &p2 = points[(i + 1) % len];
+  
+          double cross = (p1.x * p2.y) - (p2.x * p1.y);
+          cx += (p1.x + p2.x) * cross;
+          cy += (p1.y + p2.y) * cross;
+      }
+  
+      cx /= (6.0 * area);
+      cy /= (6.0 * area);
+  
+      return {cx, cy};
+  }
+
 };
 } // namespace levkin
 
