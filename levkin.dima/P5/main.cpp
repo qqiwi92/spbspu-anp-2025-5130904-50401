@@ -119,12 +119,22 @@ class Polygon : public Shape {
     anchor.x += dx;
     anchor.y += dy;
   }
-  virtual void scale(double k) override {}
+  
+  virtual void scale(double k) override {
+      if (k <= 0.0 || len == 0) return;
+      point_t center = find_center(); 
+      for (size_t i = 0; i < len; ++i) {
+          points[i].x = center.x + (points[i].x - center.x) * k;
+          points[i].y = center.y + (points[i].y - center.y) * k;
+      }
+  }
+  
   ~Polygon() { delete points; }
   Polygon(const Polygon &poly) = default;
   Polygon(Polygon &&poly) = default;
   Polygon &operator=(const Polygon &poly) = default;
   Polygon &operator=(Polygon &&poly) = default;
+  
   point_t find_center() const {
       if (len == 0) {
           return {0, 0};
