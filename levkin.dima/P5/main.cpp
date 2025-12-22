@@ -1,6 +1,7 @@
 #include <iostream>
 
 namespace levkin {
+double abs(double x) { return (x >= 0) ? x : -x; }
 struct point_t {
   double x, y;
 };
@@ -72,7 +73,7 @@ class Polygon : public Shape {
       const point_t &p2 = points[(1 + i) % len];
       area += (p1.x * p2.y) - (p2.x * p1.y);
     }
-    return (area > 0 ? area : -area) / 2.0;
+    return abs(area) / 2.0;
   }
   virtual rectangle_t getFrameRect() const override {
     if (len == 0) {
@@ -119,52 +120,66 @@ class Polygon : public Shape {
     anchor.x += dx;
     anchor.y += dy;
   }
-  
+
   virtual void scale(double k) override {
-      if (k <= 0.0 || len == 0) return;
-      point_t center = find_center(); 
-      for (size_t i = 0; i < len; ++i) {
-          points[i].x = center.x + (points[i].x - center.x) * k;
-          points[i].y = center.y + (points[i].y - center.y) * k;
-      }
+    if (k <= 0.0 || len == 0)
+      return;
+    point_t center = find_center();
+    for (size_t i = 0; i < len; ++i) {
+      points[i].x = center.x + (points[i].x - center.x) * k;
+      points[i].y = center.y + (points[i].y - center.y) * k;
+    }
   }
-  
+
   ~Polygon() { delete points; }
   Polygon(const Polygon &poly) = default;
   Polygon(Polygon &&poly) = default;
   Polygon &operator=(const Polygon &poly) = default;
   Polygon &operator=(Polygon &&poly) = default;
-  
+
   point_t find_center() const {
-      if (len == 0) {
-          return {0, 0};
-      }
-  
-      double area = getArea();
-      if (area == 0) {
-          return {0, 0};
-      }
-  
-      double cx = 0.0;
-      double cy = 0.0;
-  
-      for (size_t i = 0; i < len; ++i) {
-          const point_t &p1 = points[i];
-          const point_t &p2 = points[(i + 1) % len];
-  
-          double cross = (p1.x * p2.y) - (p2.x * p1.y);
-          cx += (p1.x + p2.x) * cross;
-          cy += (p1.y + p2.y) * cross;
-      }
-  
-      cx /= (6.0 * area);
-      cy /= (6.0 * area);
-  
-      return {cx, cy};
+    if (len == 0) {
+      return {0, 0};
+    }
+
+    double area = getArea();
+    if (area == 0) {
+      return {0, 0};
+    }
+
+    double cx = 0.0;
+    double cy = 0.0;
+
+    for (size_t i = 0; i < len; ++i) {
+      const point_t &p1 = points[i];
+      const point_t &p2 = points[(i + 1) % len];
+
+      double cross = (p1.x * p2.y) - (p2.x * p1.y);
+      cx += (p1.x + p2.x) * cross;
+      cy += (p1.y + p2.y) * cross;
+    }
+
+    cx /= (6.0 * area);
+    cy /= (6.0 * area);
+
+    return {cx, cy};
   }
-
 };
-} // namespace levkin
 
+void isotropicly_scale(Shape &shape, point_t anchor, double factor) {
+    if (factor <= 0.0) return; 
+    rectangle_t frame = shape.getFrameRect();
+    point_t init_pos = frame.pos;
+
+    double dx = init_pos.x - anchor.x;
+    double dy = init_pos.y - anchor.y;
+
+    shape.move(anchor);
+    shape.scale(factor);
+    shape.move({anchor.x + dx * factor, anchor.y + dy * factor});
+}
+
+
+} // namespace levkin
 
 int main() {}
