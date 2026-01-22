@@ -23,7 +23,7 @@ int main()
 
     std::cout << "Has repeated: " << levkin::has_rep(str) << "\n";
 
-    char* cleaned = static_cast<char*>(malloc(len + 1));
+    char* cleaned = static_cast< char* >(malloc(len + 1));
     if (!cleaned)
     {
         std::cerr << "Error: cannot allocate memory\n";
