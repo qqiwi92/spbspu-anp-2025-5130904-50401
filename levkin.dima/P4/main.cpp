@@ -4,8 +4,43 @@
 #include <cctype>
 
 namespace levkin {
+  char* extend(char* old_buffer, size_t old_size, size_t new_size);
+  char* getLine(std::istream& in, size_t& size);
+  int has_rep(const char* s);
+  char* lat_rmv(const char* original, char* destination, size_t& s);
+}
 
-char* extend(char* old_buffer, size_t old_size, size_t new_size)
+int main()
+{
+    size_t len = 0;
+    char* str = levkin::getLine(std::cin, len);
+
+    if (!str || len == 0)
+    {
+        std::cerr << "Error: cannot allocate memory or empty input\n";
+        return 1;
+    }
+
+    std::cout << "Has repeated: " << levkin::has_rep(str) << "\n";
+
+    char* cleaned = static_cast<char*>(malloc(len + 1));
+    if (!cleaned)
+    {
+        std::cerr << "Error: cannot allocate memory\n";
+        free(str);
+        return 1;
+    }
+
+    size_t cleaned_len = 0;
+    levkin::lat_rmv(str, cleaned, cleaned_len);
+    std::cout << "Removed English letter:: " << cleaned << "\n";
+
+    free(cleaned);
+    free(str);
+    return 0;
+}
+
+char* levkin::extend(char* old_buffer, size_t old_size, size_t new_size)
 {
     char* new_buffer = reinterpret_cast<char*>(malloc(new_size));
     if (!new_buffer)
@@ -23,7 +58,7 @@ char* extend(char* old_buffer, size_t old_size, size_t new_size)
     return new_buffer;
 }
 
-char* getLine(std::istream& in, size_t& size)
+char* levkin::getLine(std::istream& in, size_t& size)
 {
     bool is_skip_ws = in.flags() & std::ios_base::skipws;
 
@@ -85,7 +120,8 @@ char* getLine(std::istream& in, size_t& size)
     }
     return buffer;
 }
-int has_rep(const char* s)
+
+int levkin::has_rep(const char* s)
 {
     unsigned char visited[256] = {0};
     if (!s) return 0;
@@ -98,7 +134,7 @@ int has_rep(const char* s)
     return 0;
 }
 
-char* lat_rmv(const char* original, char* destination, size_t& s)
+char* levkin::lat_rmv(const char* original, char* destination, size_t& s)
 {
     if (!original || !destination)
     {
@@ -118,36 +154,4 @@ char* lat_rmv(const char* original, char* destination, size_t& s)
     destination[w] = '\0';
     s = w;
     return destination;
-}
-
-}
-
-int main()
-{
-    size_t len = 0;
-    char* str = levkin::getLine(std::cin, len);
-
-    if (!str || len == 0)
-    {
-        std::cerr << "Error: cannot allocate memory or empty input\n";
-        return 1;
-    }
-
-    std::cout << "Has repeated: " << levkin::has_rep(str) << "\n";
-
-    char* cleaned = static_cast<char*>(malloc(len + 1));
-    if (!cleaned)
-    {
-        std::cerr << "Error: cannot allocate memory\n";
-        free(str);
-        return 1;
-    }
-
-    size_t cleaned_len = 0;
-    levkin::lat_rmv(str, cleaned, cleaned_len);
-    std::cout << "Removed English letter:: " << cleaned << "\n";
-
-    free(cleaned);
-    free(str);
-    return 0;
 }
