@@ -82,7 +82,12 @@ char* levkin::getLine(std::istream& in, size_t& size)
             if (!tmp)
             {
                 free(buffer);
-                if (is_skip_ws) in >> std::skipws;
+
+                if (is_skip_ws)
+                {
+                  in >> std::skipws;
+                }
+
                 return nullptr;
             }
 
@@ -106,7 +111,11 @@ char* levkin::getLine(std::istream& in, size_t& size)
         if (!tmp)
         {
             free(buffer);
-            if (is_skip_ws) in >> std::skipws;
+
+            if (is_skip_ws){
+              in >> std::skipws;
+            }
+
             return nullptr;
         }
         buffer = tmp;
@@ -124,11 +133,21 @@ char* levkin::getLine(std::istream& in, size_t& size)
 int levkin::has_rep(const char* s)
 {
     unsigned char visited[256] = {0};
-    if (!s) return 0;
+
+    if (!s)
+    {
+      return 0;
+    }
+
     for (; *s; ++s)
     {
         unsigned char c = *s;
-        if (visited[c]) return 1;
+
+        if (visited[c])
+        {
+          return 1;
+        }
+
         visited[c] = 1;
     }
     return 0;
@@ -145,7 +164,7 @@ char* levkin::lat_rmv(const char* original, char* destination, size_t& s)
     for (size_t r = 0; original[r]; ++r)
     {
         char ch = original[r];
-        if (isalpha(static_cast<unsigned char>(ch)))
+        if (isalpha(static_cast< unsigned char >(ch)))
         {
             continue;
         }
